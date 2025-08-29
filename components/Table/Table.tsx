@@ -1,4 +1,3 @@
-// components/Table/DocumentsTable.tsx
 'use client';
 
 import * as React from 'react';
@@ -12,11 +11,12 @@ import { FileText, FileType, FileImage, FileVideo, FileAudio, FileArchive } from
 
 export type Stage = 'Full' | 'Onboarding' | 'Franchisee' | 'Prospect';
 
+// 👇 ext ko string bana diya (flexible)
 export interface DocumentRow {
   id: string;
   name: string;
   size: string;
-  ext: 'pdf' | 'doc' | 'jpg' | 'mp4' | 'mp3' | 'aep';
+  ext: string;
   docType: string;
   aiApp: boolean;
   dashboard: boolean;
@@ -24,7 +24,7 @@ export interface DocumentRow {
 }
 
 export interface DocumentsTableProps {
-  rows?: DocumentRow[]; // made optional and defaulted below
+  rows?: DocumentRow[];
   onToggleAI?: (id: string, checked: boolean) => void;
   onToggleDashboard?: (id: string, checked: boolean) => void;
   onStageChange?: (id: string, stage: Stage) => void;
@@ -32,7 +32,7 @@ export interface DocumentsTableProps {
   onEdit?: (id: string) => void;
 }
 
-function FileIcon({ ext }: { ext: DocumentRow['ext'] }) {
+function FileIcon({ ext }: { ext: string }) {
   const base =
     'relative inline-flex h-9 w-9 items-center justify-center rounded-md bg-white ring-1 ring-gray-200 shadow-sm';
   const label =
@@ -54,6 +54,7 @@ function FileIcon({ ext }: { ext: DocumentRow['ext'] }) {
         </span>
       );
     case 'jpg':
+    case 'png':
       return (
         <span className={base}>
           <FileImage className="size-5 text-emerald-600" />
@@ -75,11 +76,19 @@ function FileIcon({ ext }: { ext: DocumentRow['ext'] }) {
         </span>
       );
     case 'aep':
-    default:
       return (
         <span className={base}>
           <FileArchive className="size-5 text-gray-700" />
           <span className={`${label} bg-gray-50 text-gray-700 ring-gray-200`}>AEP</span>
+        </span>
+      );
+    default:
+      return (
+        <span className={base}>
+          <FileArchive className="size-5 text-gray-500" />
+          <span className={`${label} bg-gray-50 text-gray-500 ring-gray-200`}>
+            {ext.toUpperCase()}
+          </span>
         </span>
       );
   }
@@ -93,22 +102,28 @@ function DocTypeBadge({ label }: { label: string }) {
     'Vendors & Assets': 'bg-emerald-50 text-emerald-700 ring-emerald-200',
   };
   const cls = palette[label] ?? 'bg-gray-50 text-gray-700 ring-gray-200';
-  return <Badge variant="secondary" className={`rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ${cls} border-0`}>{label}</Badge>;
+  return (
+    <Badge
+      variant="secondary"
+      className={`rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ${cls} border-0`}
+    >
+      {label}
+    </Badge>
+  );
 }
 
 export function DocumentsTable({
-  rows = [], // default prevents undefined access
+  rows = [],
   onToggleAI = () => {},
   onToggleDashboard = () => {},
   onStageChange = () => {},
   onDelete = () => {},
   onEdit = () => {},
 }: DocumentsTableProps) {
-  const data = React.useMemo(() => (Array.isArray(rows) ? rows : []), [rows]); // normalize once
-
+  const data = React.useMemo(() => (Array.isArray(rows) ? rows : []), [rows]);
   const [selected, setSelected] = React.useState<Set<string>>(new Set());
 
-  const allSelected = selected.size === data.length && data.length > 0; // safe check
+  const allSelected = selected.size === data.length && data.length > 0;
   const toggleAll = React.useCallback(
     (checked: boolean) => {
       setSelected(checked ? new Set(data.map((r) => r.id)) : new Set());
@@ -126,12 +141,16 @@ export function DocumentsTable({
   }, []);
 
   return (
-    <div className="w-full overflow-x-auto   border-gray-200 bg-white shadow-sm">
+    <div className="w-full overflow-x-auto border-gray-200 bg-white shadow-sm">
       <Table>
         <TableHeader className="bg-gray-100">
           <TableRow className="[&>th]:h-12">
             <TableHead className="w-[36px]">
-              <Checkbox checked={allSelected} onCheckedChange={(v) => toggleAll(Boolean(v))} aria-label="Select all" />
+              <Checkbox
+                checked={allSelected}
+                onCheckedChange={(v) => toggleAll(Boolean(v))}
+                aria-label="Select all"
+              />
             </TableHead>
             <TableHead className="min-w-[300px]">Document Name</TableHead>
             <TableHead>Document Type</TableHead>
@@ -146,7 +165,11 @@ export function DocumentsTable({
           {data.map((row) => (
             <TableRow key={row.id} className="align-middle">
               <TableCell className="w-[36px]">
-                <Checkbox checked={selected.has(row.id)} onCheckedChange={(v) => toggleOne(row.id, Boolean(v))} aria-label={`Select ${row.name}`} />
+                <Checkbox
+                  checked={selected.has(row.id)}
+                  onCheckedChange={(v) => toggleOne(row.id, Boolean(v))}
+                  aria-label={`Select ${row.name}`}
+                />
               </TableCell>
 
               <TableCell>
@@ -164,15 +187,26 @@ export function DocumentsTable({
               </TableCell>
 
               <TableCell className="text-center">
-                <Switch checked={row.aiApp} onCheckedChange={(v) => onToggleAI(row.id, Boolean(v))} className="data-[state=checked]:bg-sky-500" />
+                <Switch
+                  checked={row.aiApp}
+                  onCheckedChange={(v) => onToggleAI(row.id, Boolean(v))}
+                  className="data-[state=checked]:bg-sky-500"
+                />
               </TableCell>
 
               <TableCell className="text-center">
-                <Switch checked={row.dashboard} onCheckedChange={(v) => onToggleDashboard(row.id, Boolean(v))} className="data-[state=checked]:bg-sky-500" />
+                <Switch
+                  checked={row.dashboard}
+                  onCheckedChange={(v) => onToggleDashboard(row.id, Boolean(v))}
+                  className="data-[state=checked]:bg-sky-500"
+                />
               </TableCell>
 
               <TableCell>
-                <Select defaultValue={row.stage} onValueChange={(v) => onStageChange(row.id, v as Stage)}>
+                <Select
+                  defaultValue={row.stage}
+                  onValueChange={(v) => onStageChange(row.id, v as Stage)}
+                >
                   <SelectTrigger className="h-9 w-[160px] rounded-lg border-gray-200 bg-white shadow-sm">
                     <SelectValue />
                   </SelectTrigger>
@@ -187,10 +221,18 @@ export function DocumentsTable({
 
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-3">
-                  <Button variant="link" className="h-8 px-0 text-sm text-gray-600 hover:text-gray-900" onClick={() => onDelete(row.id)}>
+                  <Button
+                    variant="link"
+                    className="h-8 px-0 text-sm text-gray-600 hover:text-gray-900"
+                    onClick={() => onDelete(row.id)}
+                  >
                     Delete
                   </Button>
-                  <Button variant="link" className="h-8 px-0 text-sm text-sky-600 hover:text-gray-900" onClick={() => onEdit(row.id)}>
+                  <Button
+                    variant="link"
+                    className="h-8 px-0 text-sm text-sky-600 hover:text-gray-900"
+                    onClick={() => onEdit(row.id)}
+                  >
                     Edit
                   </Button>
                 </div>
