@@ -7,16 +7,20 @@ import FinancialWellbeing from "@/components/FinancialWellbeingCard/FinancialWel
 import ProspectLeads from "@/components/ProspectLeadsCard/ProspectLeadsCard";
 import UploadsHeader from "@/components/UploadHead/UploadsHeader";
 import SearchWithFilters from "@/components/SearchAndFilter/SearchAndFilter";
-import DocumentsTable from "@/components/Table/Table";
+import DocumentsTable, { DocumentRow } from "@/components/Table/Table"; // 👈 yahan se type import kar rahe hain
 
-const rows = [
-  { id:'1', name:'Tech requirements.pdf', size:'200 KB', ext:'pdf', docType:'Legal', aiApp:true, dashboard:true, stage:'Full' },
-  { id:'2', name:'Dashboard screenshot.jpg', size:'720 KB', ext:'jpg', docType:'Vendors & Assets', aiApp:true, dashboard:true, stage:'Onboarding' },
-  { id:'3', name:'Dashboard prototype recording.mp4', size:'16 MB', ext:'mp4', docType:'Technology', aiApp:false, dashboard:true, stage:'Franchisee' },
-  { id:'4', name:'Financial Overview', size:'4.2 MB', ext:'doc', docType:'Financial', aiApp:true, dashboard:true, stage:'Prospect' },
-  { id:'5', name:'UX Design Guidelines.docx', size:'400 KB', ext:'doc', docType:'Legal', aiApp:true, dashboard:false, stage:'Onboarding' },
-  { id:'6', name:'Dashboard interaction.aep', size:'12 MB', ext:'aep', docType:'Legal', aiApp:true, dashboard:true, stage:'Onboarding' },
-  { id:'7', name:'Briefing call recording.mp3', size:'18.6 MB', ext:'mp3', docType:'Financial', aiApp:false, dashboard:false, stage:'Prospect' },
+// 👇 Stage type define
+type Stage = "Full" | "Onboarding" | "Franchisee" | "Prospect";
+
+// 👇 Rows ka type lagao
+const rows: DocumentRow[] = [
+  { id: "1", name: "Tech requirements.pdf", size: "200 KB", ext: "pdf", docType: "Legal", aiApp: true, dashboard: true, stage: "Full" as Stage },
+  { id: "2", name: "Dashboard screenshot.jpg", size: "720 KB", ext: "jpg", docType: "Vendors & Assets", aiApp: true, dashboard: true, stage: "Onboarding" as Stage },
+  { id: "3", name: "Dashboard prototype recording.mp4", size: "16 MB", ext: "mp4", docType: "Technology", aiApp: false, dashboard: true, stage: "Franchisee" as Stage },
+  { id: "4", name: "Financial Overview", size: "4.2 MB", ext: "doc", docType: "Financial", aiApp: true, dashboard: true, stage: "Prospect" as Stage },
+  { id: "5", name: "UX Design Guidelines.docx", size: "400 KB", ext: "doc", docType: "Legal", aiApp: true, dashboard: false, stage: "Onboarding" as Stage },
+  { id: "6", name: "Dashboard interaction.aep", size: "12 MB", ext: "aep", docType: "Legal", aiApp: true, dashboard: true, stage: "Onboarding" as Stage },
+  { id: "7", name: "Briefing call recording.mp3", size: "18.6 MB", ext: "mp3", docType: "Financial", aiApp: false, dashboard: false, stage: "Prospect" as Stage },
 ];
 
 export default function DashboardLayout() {
@@ -25,7 +29,7 @@ export default function DashboardLayout() {
       <Sidebar />
 
       {/* Right Content */}
-      <div className="flex min-w-0 flex-1 flex-col"> 
+      <div className="flex min-w-0 flex-1 flex-col">
         <Header />
 
         {/* Main Dashboard Content */}
@@ -54,8 +58,7 @@ export default function DashboardLayout() {
               <SearchWithFilters />
             </div>
 
-            
-            <div className="flow-root"> 
+            <div className="flow-root">
               <div className="overflow-x-auto">
                 <div className="inline-block min-w-full align-middle">
                   <DocumentsTable rows={rows} />
